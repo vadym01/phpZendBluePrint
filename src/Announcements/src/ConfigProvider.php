@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Announcements;
 
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
+
 /**
  * The configuration provider for the Announcements module
  *
@@ -22,6 +25,7 @@ class ConfigProvider
         return [
             'dependencies' => $this->getDependencies(),
             'templates'    => $this->getTemplates(),
+            'doctrine'     =>$this->getDoctrineEntities(),
         ];
     }
 
@@ -53,6 +57,25 @@ class ConfigProvider
         return [
             'paths' => [
                 'announcements'    => [__DIR__ . '/../templates/'],
+            ],
+        ];
+    }
+
+    public function getDoctrineEntities() : array
+    {
+        return [
+            'driver' => [
+                'orm_default' => [
+                    'class' => MappingDriverChain::class,
+                    'drivers' => [
+                        'Announcements\Entity' => 'announcement_entity',
+                    ],
+                ],
+                'announcement_entity' => [
+                    'class' => AnnotationDriver::class,
+                    'cache' => 'array',
+                    'paths' => [__DIR__ . '/Entity'],
+                ],
             ],
         ];
     }
